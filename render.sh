@@ -110,9 +110,6 @@ main() {
 	fn_need_cmd "sed"
 	fn_need_cmd "cut"
 
-	cd "$( dirname "$0" )" || fn_exit_err "Can't 'cd' into '$( dirname "$0" )'" $ERR_NO_FILE
-	m_say "cd '$(pwd)'"
-
 	# PARSE ARGUMENTS
 	while [[ $# -ge 1 ]]; do
 		case "$1" in
@@ -145,6 +142,9 @@ main() {
 		# Delete $1
 		shift
 	done
+
+	cd "$( dirname "$0" )" || fn_exit_err "Can't 'cd' into '$( dirname "$0" )'" $ERR_NO_FILE
+	m_say "cd '$(pwd)'"
 
 	[[ $DEBUG ]] && { fn_say_debug "Parameters:"; fn_print_params; }
 
