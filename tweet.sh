@@ -10,6 +10,9 @@
 #       CREATED: 04/05/2018 02:28:35 PM
 #===============================================================================
 
+# TODO:
+# 	check that every arg is a file before processing
+
 # Set debug parameters
 [[ $DEBUG ]] && set -o nounset
 set -o pipefail #-o errexit
