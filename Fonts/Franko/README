@@ -1,0 +1,55 @@
+
+Franko and Franco
+=================
+
+
+The Great Renaming
+------------------
+
+Franko is Roboto v1.2.310 with the feature set rewritten for less surprise.
+Franco is Roboto Condensed v1.2.311 given the same treatment. Both were
+renamed to minimise name clash. They are still Apache-licensed, of course.
+
+You may remember that Roboto v1 was nicknamed 'the four-headed Frankenfont'.
+The names Franko and Franco (FRANko COndensed) derive from that.
+
+The TTF files are not hinted. I have never found any hinted v1.2 files.
+
+
+Feature list
+------------
+
+Existing features, mentioned in application order:
+
+smcp/pcap: Convert minuscules to small/petite caps. Since Franko and Franco
+have only petite caps (only as tall as the minuscules themselves), they are
+mapped onto both 'smcp' and 'pcap': The former for maximum availability, the
+latter because they *are* petite caps. They should also decompose the four
+extant ligatures, but I haven't got around to test that.
+
+c2sc/c2pc: Convert majuscules to small/petite caps. Same sob story as smcp
+and pcap.
+
+liga: Ligates the common combinations of 'fi', 'fl', 'ffi' and 'ffl'.
+
+pnum: The default numerals are lining/tabular. 'pnum' swings in lining/
+proportionally-spaced numerals instead.
+
+frac: Builds a few common fractions: 1/8, 1/4, 3/8, 1/2, 5/8, 3/4 and 7/8. It
+will also replace the sequences '0/0', 'O/O' and 'o/o' with a percent sign,
+and the sequences '0/00', 'O/OO' and 'o/oo' with a permille sign.
+
+ordn: Ordinal signs. Replaces 'a' and 'o' following numerals with the
+corresponding ordinal signs.
+
+ss01: Stylistic Set 1. Replaces 'g' with an alternate version.
+
+ss02: Stylistic Set 2. Replaces the greek 'alpha' with an alternate version.
+
+ss03: Stylistic Set 3. Replaces 'R' with an alternate version.
+
+ss04: Stylistic Set 4. Replaces 'K'/'k' with alternate versions.
+
+ss05: Stylistic Set 5. Replaces 'K'/'k' with different alternate versions.
+
+There is currently no 'aalt' to Access All Alternates.

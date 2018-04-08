@@ -1,0 +1,10 @@
+* refaire situation.sh !!!!
+	* must parse full quote string ITSELF
+		* full quote string: two '@'-separated fields "QUOTE@SOURCE"
+	* parameter for line height in imagemagick?
+* quote image
+	* make larger quote image by default
+	* reduce margins to a minimum
+* make libcurl C program instead of radibot.sh
+* no way to batch render anything yet !
+	* make C program for batch-rendering?
