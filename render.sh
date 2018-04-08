@@ -10,11 +10,12 @@
 #===============================================================================
 
 # TODO:
-# 	The current --reset prompt might be problematic when handling big 'quotes' file
-# 	Make --reset prompt would ask for file(s) to remove in this fashion:
+# 	* The current --reset prompt might be problematic when handling big 'quotes' file
+# 	  Make --reset prompt would ask for file(s) to remove in this fashion:
 # 		1: render/marx-lol_fags.png
 # 		2: render/engels-mad_bra?.png
 # 		Files to remove (1..2)? || 		# || is the cursor
+# 	* Make option (-q?) to get quotes from another 'quotes' file
 
 # Set debug parameters
 [[ $DEBUG ]] && set -o nounset
@@ -47,12 +48,12 @@ fn_show_help() {
     cat << EOF
 $SCRIPT_NAME $VERSION
     Radiquote renderer for Aufhebung.
-    Batch-render quote images.
+    Batch-render quote images from '$FILE_QUOTES'.
 USAGE
     $SCRIPT_NAME [OPTIONS] [--help]
 OPTIONS
     -d RENDER_DIR       set directory for rendered quote images
-                        (default: "$RENDER_DIR")
+                        (default: "$DIR_RENDER")
     --reset             reset all image files inside render directory (prompt)
     -f                  with --reset, disable prompt
     --                  all arguments beyond '--' will be transmitted to
