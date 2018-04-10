@@ -10,12 +10,13 @@
 #===============================================================================
 
 # TODO:
+# 	* ./render.sh --reset: NOT WORKING!
 # 	* The current --reset prompt might be problematic when handling big 'quotes' file
 # 	  Make --reset prompt would ask for file(s) to remove in this fashion:
 # 		1: render/marx-lol_fags.png
 # 		2: render/engels-mad_bra?.png
 # 		Files to remove (1..2)? || 		# || is the cursor
-# 	* Make option (-q?) to get quotes from another 'quotes' file
+# 	* Use default arg (*) for input 'quotes'-like file
 
 # Set debug parameters
 [[ $DEBUG ]] && set -o nounset
@@ -23,6 +24,8 @@ set -o errexit -o pipefail
 
 LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
 source "$LIBSYL"
+LIBPARSE=${LIBPARSE:-$HOME/Devel/Src/radiquotes/libparse.sh}
+source "$LIBPARSE"
 
 VERSION=0.9
 
@@ -40,7 +43,6 @@ FILE_QUOTES_TMP=
 # Extension of rendered images
 EXT="png"
 # Error codes
-ERR_PARSE=11
 ERR_FNAME=22
 
 # Print help
@@ -76,21 +78,9 @@ fn_print_params() {
  OPT_RESET      $OPT_RESET
 EOF
 }
-# Create tmp file for 'quotes'
-fn_mktemp() {
-	RET="$( mktemp ${TMP_DIR}/quotes.XXX )"
-}
 # $1: line number, $2: file
 fn_get_line() {
 	RET=$( sed -n "$1p" $2 )
-}
-# $1: line to parse
-fn_parse_quote() {
-	RET=$( echo $1 | cut -d '@' -f1 )
-}
-# $1: line to parse
-fn_parse_source() {
-	RET=$( echo $1 | cut -d '@' -f2 )
 }
 # $1: full quote, $2: full source
 fn_make_filename() {
@@ -144,8 +134,7 @@ main() {
 		shift
 	done
 
-	cd "$( dirname "$0" )" || fn_exit_err "Can't 'cd' into '$( dirname "$0" )'" $ERR_NO_FILE
-	m_say "cd '$(pwd)'"
+	fn_cd_workdir
 
 	[[ $DEBUG ]] && { fn_say_debug "Parameters:"; fn_print_params; }
 
@@ -168,7 +157,7 @@ main() {
 	fi
 
 	# Making temp file
-	fn_mktemp
+	fn_mktemp "radiquotes-render"
 	[[ -n "$RET" ]] || fn_exit_err "Can't create temporary file in '${TMP_DIR}/'" $ERR_NO_FILE
 	FILE_QUOTES_TMP=$RET
 	trap 'rm -v "$FILE_QUOTES_TMP"' EXIT
@@ -185,10 +174,8 @@ main() {
 		local FNAME=
 
 		fn_parse_quote "$LINE"
-		[[ -n "$RET" ]] || fn_exit_err "Can't get quote out of line \"$LINE\"" $ERR_PARSE
 		QUOTE="$RET"
 		fn_parse_source "$LINE"
-		[[ -n "$RET" ]] || fn_exit_err "Can't get source out of line \"$LINE\"" $ERR_PARSE
 		SOURCE="$RET"
 
 		fn_say_debug "Quote: $QUOTE"

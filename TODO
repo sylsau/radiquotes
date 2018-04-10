@@ -1,3 +1,5 @@
+* empty RET at start of all func
+* use libparse everywhere
 * refaire situation.sh !!!!
 	* must parse full quote string ITSELF
 		* full quote string: two '@'-separated fields "QUOTE@SOURCE"

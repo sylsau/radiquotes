@@ -31,6 +31,12 @@ ifndef BG
 #BG = $(FILE_BG_G)
 	BG = $(FILE_BG_B)
 endif
+ifndef TEST_Q
+	TEST_Q = Le principe de la production marchande, c’est la perte de soi dans la création chaotique et inconsciente d’un monde qui échappe totalement à ses créateurs. Le noyau radicalement révolutionnaire de l’autogestion généralisée, c’est, au contraire, la direction consciente par tous de l’ensemble de la vie. [...] La tâche des Conseils Ouvriers ne sera donc pas l’autogestion du monde existant, mais sa transformation qualitative ininterrompue : le dépassement concret de la marchandise (en tant que gigantesque détour de la production de l’homme par lui-même).
+endif
+ifndef TEST_A
+	TEST_A = Internationale Situationniste, De la Misère en Milieu Étudiant (1966)
+endif
 ifndef TEST_OUT
 	TEST_OUT = /tmp/test.png
 endif
@@ -50,6 +56,9 @@ help:
 	@echo "    FONTQ='{name|path}'  (defaults to '$(FONTQ)')"
 	@echo "    FONTA='{name|path}'  (defaults to '$(FONTA)')"
 	@echo "    FONTCOL='{color}'    (defaults to '$(FONTCOL)')"
+	@echo "    TEST_Q='{quote}'"
+	@echo "    TEST_A='{author}'"
+	@echo "    TEST_OUT='/path/to/outfile'"
 	@echo
 	@echo "EXAMPLES"
 	@echo "    $(MAKE) OUT=/tmp/lol A='Karlos Marakas' Q='lmfao bitch' \\"
@@ -86,7 +95,7 @@ endif
 	@[[ -z "$(SHOW)" ]] || xdg-open "$(OUT)"
 
 test-quote-pic:
-	$(SITUATION) -f -q "Le principe de la production marchande, c’est la perte de soi dans la création chaotique et inconsciente d’un monde qui échappe totalement à ses créateurs. Le noyau radicalement révolutionnaire de l’autogestion généralisée, c’est, au contraire, la direction consciente par tous de l’ensemble de la vie. [...] La tâche des Conseils Ouvriers ne sera donc pas l’autogestion du monde existant, mais sa transformation qualitative ininterrompue : le dépassement concret de la marchandise (en tant que gigantesque détour de la production de l’homme par lui-même)." -a "Internationale Situationniste, De la Misère en Milieu Étudiant (1966)" -o "$(TEST_OUT)" -fontq "$(FONTQ)" -fonta "$(FONTA)" -fontcol "$(FONTCOL)" -b "$(BG)"
+	$(SITUATION) -f -q "$(TEST_Q)" -a "$(TEST_A)" -o "$(TEST_OUT)" -fontq "$(FONTQ)" -fonta "$(FONTA)" -fontcol "$(FONTCOL)" -b "$(BG)"
 	xdg-open "$(TEST_OUT)"
 
 quotes: $(FILE_QUOTES_ORIG) $(FILE_VIM_FORMAT)
