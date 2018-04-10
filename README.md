@@ -23,6 +23,7 @@ Posts pictures of quotes from radical authors.
 ## Format of *quotes.orig*
  Do not use double quotes (") in this file.  
  Must be formatted as follows:  
+
 	# {comments}
 	{text1}
 	--- {author1}, {book1} [...]
