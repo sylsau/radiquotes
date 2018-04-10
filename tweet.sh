@@ -84,30 +84,30 @@ fn_post_quote() {
 fn_tweet() {
 	# Get a random filename argument
 	fn_get_random_file "$@"
-	[[ $RET ]] || 	fn_exit_err "Can't get random argument from '$@'" $ERR_WRONG_ARG
+	[[ $RET ]] || 	syl_exit_err "Can't get random argument from '$@'" $ERR_WRONG_ARG
 	FILE_TO_UPLOAD="$RET"
 	# Get status (author) from filename
 	fn_get_author "$FILE_TO_UPLOAD"
-	[[ $RET ]] || 	fn_exit_err "Can't get author from file '$FILE_TO_UPLOAD'" $ERR_PARSE_AUTHOR
+	[[ $RET ]] || 	syl_exit_err "Can't get author from file '$FILE_TO_UPLOAD'" $ERR_PARSE_AUTHOR
 	STATUS="$RET"
 	# Announcing post
-	m_say "Posting '$FILE_TO_UPLOAD' with \"$STATUS\" in:"
+	msyl_say "Posting '$FILE_TO_UPLOAD' with \"$STATUS\" in:"
 	for i in `seq 5 -1 1`; do echo -n "$i.." && sleep 1 ; done
 	echo
 	# Upload image on twatter
 	fn_upload_quote "$FILE_TO_UPLOAD"
-	[[ $RET ]] || 	fn_exit_err "Error when uploading file '$FILE_TO_UPLOAD'; please see '$FILE_LOG'" $ERR_UPLOAD
+	[[ $RET ]] || 	syl_exit_err "Error when uploading file '$FILE_TO_UPLOAD'; please see '$FILE_LOG'" $ERR_UPLOAD
 	MEDIA_IDS="$RET"
 	# Update status with uploaded image
 	fn_post_quote "$MEDIA_IDS"
-	[[ $RET ]] || 	fn_exit_err "Can't tweet with media id '$MEDIA_IDS'" $ERR_POST
+	[[ $RET ]] || 	syl_exit_err "Can't tweet with media id '$MEDIA_IDS'" $ERR_POST
 }
 
 
 main() {
-	fn_need_cmd "$TWURL"
-	fn_need_cmd "sed"
-	fn_need_cmd "make"
+	syl_need_cmd "$TWURL"
+	syl_need_cmd "sed"
+	syl_need_cmd "make"
 
 	# Parse arguments
 	[[ $# -eq 0 ]] 		&& 	SHOW_HELP=1
@@ -116,7 +116,7 @@ main() {
 	[[ "$SHOW_HELP" -eq 1 ]]&& 	{ fn_show_help ; exit ; }
 
 	fn_tweet "$@"
-	m_say "\nJust tweeted!"
+	msyl_say "\nJust tweeted!"
 }
 
 main "$@"

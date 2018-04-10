@@ -97,15 +97,15 @@ fn_render() {
 
 
 main() {
-	fn_need_cmd "mktemp"
-	fn_need_cmd "sed"
-	fn_need_cmd "cut"
+	syl_need_cmd "mktemp"
+	syl_need_cmd "sed"
+	syl_need_cmd "cut"
 
 	# PARSE ARGUMENTS
 	while [[ $# -ge 1 ]]; do
 		case "$1" in
 			"-d")
-				[[ $2 ]] || fn_exit_err "missing argument to '-d'" $ERR_WRONG_ARG
+				[[ $2 ]] || syl_exit_err "missing argument to '-d'" $ERR_WRONG_ARG
 				shift
 				DIR_RENDER="$1"
 				;;
@@ -126,7 +126,7 @@ main() {
 				OPT_DRYRUN=1
 				;;
 			*)
-				[[ $READ_SITUARGS -ne 1 ]] && fn_exit_err "invalid option '$1'" $ERR_WRONG_ARG
+				[[ $READ_SITUARGS -ne 1 ]] && syl_exit_err "invalid option '$1'" $ERR_WRONG_ARG
 				SITUARGS="$SITUARGS $1"
 				;;
 		esac	# --- end of case ---
@@ -134,9 +134,9 @@ main() {
 		shift
 	done
 
-	fn_cd_workdir
+	syl_cd_workdir
 
-	[[ $DEBUG ]] && { fn_say_debug "Parameters:"; fn_print_params; }
+	[[ $DEBUG ]] && { syl_say_debug "Parameters:"; fn_print_params; }
 
 	# Dry-run
 	[[ "$OPT_DRYRUN" -eq 1 ]] && SITUATION="echo $SITUATION"
@@ -148,7 +148,7 @@ main() {
 		local ECHO=
 
 		# Just checking var to avoid 'rm -r /*'
-		[[ -n "$DIR_RENDER" ]] || fn_exit_err "Please set render directory with '-d' or check script variable." $ERR_WRONG_ARG
+		[[ -n "$DIR_RENDER" ]] || syl_exit_err "Please set render directory with '-d' or check script variable." $ERR_WRONG_ARG
 
 		m_say "Cleaning directory '${DIR_RENDER}'..."
 		[[ "$OPT_DRYRUN" -eq 1 ]] && ECHO="echo"
@@ -157,8 +157,8 @@ main() {
 	fi
 
 	# Making temp file
-	fn_mktemp "radiquotes-render"
-	[[ -n "$RET" ]] || fn_exit_err "Can't create temporary file in '${TMP_DIR}/'" $ERR_NO_FILE
+	syl_mktemp "radiquotes-render"
+	[[ -n "$RET" ]] || syl_exit_err "Can't create temporary file in '${TMP_DIR}/'" $ERR_NO_FILE
 	FILE_QUOTES_TMP=$RET
 	trap 'rm -v "$FILE_QUOTES_TMP"' EXIT
 	cp -v "$FILE_QUOTES" "$FILE_QUOTES_TMP"
@@ -167,7 +167,7 @@ main() {
 
 	fn_get_line "$LINE_NO" "$FILE_QUOTES_TMP"
 	while [[ -n "$RET" ]]; do
-		fn_say_debug "Line $LINE_NO"
+		syl_say_debug "Line $LINE_NO"
 		local LINE="$RET"
 		local QUOTE=
 		local SOURCE=
@@ -178,13 +178,13 @@ main() {
 		fn_parse_source "$LINE"
 		SOURCE="$RET"
 
-		fn_say_debug "Quote: $QUOTE"
-		fn_say_debug "Source: $SOURCE"
+		syl_say_debug "Quote: $QUOTE"
+		syl_say_debug "Source: $SOURCE"
 
 		fn_make_filename "$QUOTE" "$SOURCE"
-		[[ -n "$RET" ]] || fn_exit_err "Can't make filename from line \"$LINE\"" $ERR_FNAME
+		[[ -n "$RET" ]] || syl_exit_err "Can't make filename from line \"$LINE\"" $ERR_FNAME
 		FNAME="$RET"
-		fn_say_debug "Output filename: $FNAME"
+		syl_say_debug "Output filename: $FNAME"
 
 		if [[ ! -f "$FNAME" ]]; then
 			m_say "Rendering '$FNAME'..."
