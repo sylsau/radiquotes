@@ -1,6 +1,6 @@
 # Radiquotes
 
-Twitter app/bot for Aufhebung.
+Twitter app/bot for Aufhebung at <http://twitter.com/AufhebungOff>.  
 Posts pictures of quotes from radical authors.
 
 ## Process
