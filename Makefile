@@ -20,8 +20,8 @@ ifndef FONTQ
 #FONTQ = $(DIR_FONTS)/Encode_sans/EncodeSansCondensed-Black.ttf
 	FONTQ = $(DIR_FONTS)/Avenir_next_condensed/AvenirNextCondensed-Heavy.ttf
 endif
-ifndef FONTA
-	FONTA = $(DIR_FONTS)/Avenir/Avenir-BookOblique.ttf
+ifndef FONTS
+	FONTS = $(DIR_FONTS)/Avenir/Avenir-BookOblique.ttf
 endif
 ifndef FONTCOL
 #FONTCOL = $(COLOR_BLACK)
@@ -32,10 +32,7 @@ ifndef BG
 	BG = $(FILE_BG_B)
 endif
 ifndef TEST_Q
-	TEST_Q = Le principe de la production marchande, c’est la perte de soi dans la création chaotique et inconsciente d’un monde qui échappe totalement à ses créateurs. Le noyau radicalement révolutionnaire de l’autogestion généralisée, c’est, au contraire, la direction consciente par tous de l’ensemble de la vie. [...] La tâche des Conseils Ouvriers ne sera donc pas l’autogestion du monde existant, mais sa transformation qualitative ininterrompue : le dépassement concret de la marchandise (en tant que gigantesque détour de la production de l’homme par lui-même).
-endif
-ifndef TEST_A
-	TEST_A = Internationale Situationniste, De la Misère en Milieu Étudiant (1966)
+	TEST_Q = Le principe de la production marchande, c’est la perte de soi dans la création chaotique et inconsciente d’un monde qui échappe totalement à ses créateurs. Le noyau radicalement révolutionnaire de l’autogestion généralisée, c’est, au contraire, la direction consciente par tous de l’ensemble de la vie. [...] La tâche des Conseils Ouvriers ne sera donc pas l’autogestion du monde existant, mais sa transformation qualitative ininterrompue : le dépassement concret de la marchandise (en tant que gigantesque détour de la production de l’homme par lui-même).@Internationale Situationniste, De la Misère en Milieu Étudiant (1966)
 endif
 ifndef TEST_OUT
 	TEST_OUT = /tmp/test.png
@@ -49,15 +46,13 @@ help:
 	@echo "    test-quote-pic - Test rendering of quote image"
 	@echo
 	@echo "PARAMETERS"
-	@echo "    Q='{quote}'"
-	@echo "    A='{author}'"
+	@echo "    Q='{quote}@{source}'"
 	@echo "    OUT='/path/to/outfile'"
 	@echo "    BG='/path/to/bgfile' (defaults to '$(BG)')"
 	@echo "    FONTQ='{name|path}'  (defaults to '$(FONTQ)')"
-	@echo "    FONTA='{name|path}'  (defaults to '$(FONTA)')"
+	@echo "    FONTS='{name|path}'  (defaults to '$(FONTS)')"
 	@echo "    FONTCOL='{color}'    (defaults to '$(FONTCOL)')"
-	@echo "    TEST_Q='{quote}'"
-	@echo "    TEST_A='{author}'"
+	@echo "    TEST_Q='{quote}@{source}'"
 	@echo "    TEST_OUT='/path/to/outfile'"
 	@echo
 	@echo "EXAMPLES"
@@ -85,17 +80,14 @@ quote-pic: $(SITUATION)
 ifndef Q
 	$(error Please set 'Q' for quote text (see 'make help'))
 endif
-ifndef A
-	$(error Please set 'A' for quote author (see 'make help'))
-endif
 ifndef OUT
 	$(error Please set 'OUT' for output file (see 'make help'))
 endif
-	$(SITUATION) -q "$(Q)" -a "$(A)" -o "$(OUT)" -fontq "$(FONTQ)" -fonta "$(FONTA)" -fontcol "$(FONTCOL)" -b "$(BG)"
+	$(SITUATION) "$(Q)" -o "$(OUT)" -fontq "$(FONTQ)" -fonts "$(FONTS)" -c "$(FONTCOL)" -bf "$(BG)"
 	@[[ -z "$(SHOW)" ]] || xdg-open "$(OUT)"
 
 test-quote-pic:
-	$(SITUATION) -f -q "$(TEST_Q)" -a "$(TEST_A)" -o "$(TEST_OUT)" -fontq "$(FONTQ)" -fonta "$(FONTA)" -fontcol "$(FONTCOL)" -b "$(BG)"
+	$(SITUATION) -f "$(TEST_Q)" -o "$(TEST_OUT)" -fontq "$(FONTQ)" -fonts "$(FONTS)" -c "$(FONTCOL)" -bf "$(BG)"
 	xdg-open "$(TEST_OUT)"
 
 quotes: $(FILE_QUOTES_ORIG) $(FILE_VIM_FORMAT)

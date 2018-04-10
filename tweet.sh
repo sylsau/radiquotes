@@ -110,10 +110,11 @@ main() {
 	syl_need_cmd "make"
 
 	# Parse arguments
+	local SHOW_HELP=
 	[[ $# -eq 0 ]] 		&& 	SHOW_HELP=1
 	[[ "$1" = "-h"  ]] 	&& 	SHOW_HELP=1
 	[[ "$1" = "--help"  ]] 	&& 	SHOW_HELP=1
-	[[ "$SHOW_HELP" -eq 1 ]]&& 	{ fn_show_help ; exit ; }
+	[[ $SHOW_HELP ]]&& 	{ fn_show_help ; exit ; }
 
 	fn_tweet "$@"
 	msyl_say "\nJust tweeted!"

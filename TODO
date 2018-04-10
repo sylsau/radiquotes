@@ -1,8 +1,18 @@
+* replace '' with unicode version of " in quotes
 * empty RET at start of all func
 * use libparse everywhere
+* quotes format
+	* allow newlines (replaced by \n):
+		* detect if several lines before "^---"
+		* Make $ -> \n
+		* e.g.:
+			this quote
+			is long
+			--- me
+
+		  will turn into:
+			this quote\nis long@me
 * refaire situation.sh !!!!
-	* must parse full quote string ITSELF
-		* full quote string: two '@'-separated fields "QUOTE@SOURCE"
 	* parameter for line height in imagemagick?
 	* option to enable/disable white guillemets
 * quote image

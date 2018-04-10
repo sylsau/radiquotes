@@ -10,12 +10,6 @@
 #===============================================================================
 
 # TODO:
-# 	* ./render.sh --reset: NOT WORKING!
-# 	* The current --reset prompt might be problematic when handling big 'quotes' file
-# 	  Make --reset prompt would ask for file(s) to remove in this fashion:
-# 		1: render/marx-lol_fags.png
-# 		2: render/engels-mad_bra?.png
-# 		Files to remove (1..2)? || 		# || is the cursor
 # 	* Use default arg (*) for input 'quotes'-like file
 
 # Set debug parameters
@@ -33,11 +27,12 @@ SITUATION="./situation.sh"
 FILE_QUOTES="./quotes"
 DIR_RENDER="./Renders"
 # Options
-OPT_RESET=0
-OPT_FORCE=0
+OPT_RESET=
+OPT_FORCE=
+OPT_DRYRUN=
 READ_SITUARGS=0
 # Default arguments for situation
-SITUARGS="-fontcol rgb(43,254,210) -fontq ./Fonts/Avenir_next_condensed/AvenirNextCondensed-Heavy.ttf -fonta ./Fonts/Avenir/Avenir-BookOblique.ttf"
+SITUARGS="-c rgb(43,254,210) -fontq ./Fonts/Avenir_next_condensed/AvenirNextCondensed-Heavy.ttf -fonts ./Fonts/Avenir/Avenir-BookOblique.ttf"
 # Temp files
 FILE_QUOTES_TMP=
 # Extension of rendered images
@@ -86,13 +81,16 @@ fn_get_line() {
 fn_make_filename() {
 	local QUOTE_START=
 	local AUTHOR=
-	QUOTE_START=$( 	echo "$1" | cut -d ' ' -f1-6 )
-	AUTHOR=$(	echo "$2" | cut -d ',' -f1 )
+	# easier use of non-breakable space UTF-8 char
+	# NOTE: must use printf to handle UTF-8 char
+	local NBSP="$( printf "\u00A0" )"
+	QUOTE_START=$( 	printf "$1" | sed 's/'$NBSP'/ /g' | cut -d ' ' -f1-6 )
+	AUTHOR=$(	printf "$2" | sed 's/'$NBSP'/ /g' | cut -d ',' -f1 )
 	RET="${DIR_RENDER}/$( echo "${AUTHOR}-${QUOTE_START}.${EXT}" | tr ' ' '_' )"
 }
-# $1: full quote, $2: full source, $3: filename
+# $1: full quote string, $3: filename
 fn_render() {
-	$SITUATION -q "$1" -a "$2" -o "$3" $SITUARGS
+	$SITUATION "$1" -o "$2" $SITUARGS
 }
 
 
@@ -139,27 +137,35 @@ main() {
 	[[ $DEBUG ]] && { syl_say_debug "Parameters:"; fn_print_params; }
 
 	# Dry-run
-	[[ "$OPT_DRYRUN" -eq 1 ]] && SITUATION="echo $SITUATION"
+	[[ $OPT_DRYRUN ]] && SITUATION="echo $SITUATION"
 
 	# Reseting render dir
-	[[ -n "$( \ls "${DIR_RENDER}" )" ]] || m_say "[Warning] Directory ${DIR_RENDER}/ is already empty." && OPT_RESET=0
-	if [[ "$OPT_RESET" -eq 1 ]]; then
-		local PROMPT_FLAG=
+	[[ -n "$( \ls "${DIR_RENDER}" )" ]] || {
+		msyl_say "[Warning] Directory ${DIR_RENDER}/ is already empty."
+		OPT_RESET=
+	}
+	if [[ $OPT_RESET ]]; then
 		local ECHO=
+		local DO_IT=
 
 		# Just checking var to avoid 'rm -r /*'
 		[[ -n "$DIR_RENDER" ]] || syl_exit_err "Please set render directory with '-d' or check script variable." $ERR_WRONG_ARG
 
-		m_say "Cleaning directory '${DIR_RENDER}'..."
-		[[ "$OPT_DRYRUN" -eq 1 ]] && ECHO="echo"
-		[[ "$OPT_FORCE" -eq 0 ]] && PROMPT_FLAG="-i"
-		$ECHO rm -rv ${PROMPT_FLAG} "${DIR_RENDER}"/*
+		msyl_say "Cleaning directory '${DIR_RENDER}'..."
+		[[ $OPT_DRYRUN ]] && ECHO="echo"
+		if [[ $OPT_FORCE ]]; then
+			DO_IT=1
+		else
+			local RESP="n"
+			echo -n "All files inside '${DIR_RENDER}/' will be deleted. Proceed? (y/n): " && read RESP
+			[[ "$RESP" = "y" ]] && DO_IT=1
+		fi
+		[[ $DO_IT ]] && $ECHO rm -rv "${DIR_RENDER}"/*
 	fi
 
 	# Making temp file
-	syl_mktemp "radiquotes-render"
-	[[ -n "$RET" ]] || syl_exit_err "Can't create temporary file in '${TMP_DIR}/'" $ERR_NO_FILE
-	FILE_QUOTES_TMP=$RET
+	syl_mktemp "radiquotes-render" ".list"
+	FILE_QUOTES_TMP="$RET"
 	trap 'rm -v "$FILE_QUOTES_TMP"' EXIT
 	cp -v "$FILE_QUOTES" "$FILE_QUOTES_TMP"
 
@@ -181,24 +187,24 @@ main() {
 		syl_say_debug "Quote: $QUOTE"
 		syl_say_debug "Source: $SOURCE"
 
-		fn_make_filename "$QUOTE" "$SOURCE"
-		[[ -n "$RET" ]] || syl_exit_err "Can't make filename from line \"$LINE\"" $ERR_FNAME
+		fn_make_filename "$QUOTE" "$SOURCE" || 
+			syl_exit_err "Can't make filename from line \"$LINE\"" $ERR_FNAME
 		FNAME="$RET"
 		syl_say_debug "Output filename: $FNAME"
 
 		if [[ ! -f "$FNAME" ]]; then
-			m_say "Rendering '$FNAME'..."
-			fn_render "$QUOTE" "$SOURCE" "$FNAME"
+			msyl_say "Rendering '$FNAME'..."
+			fn_render "$LINE" "$FNAME"
 		else
-			m_say "Not rendering '$FNAME' (already exists)"
+			msyl_say "Not rendering '$FNAME' (already exists)"
 		fi
 
 		let "LINE_NO++"
 		fn_get_line "$LINE_NO" "$FILE_QUOTES_TMP"
 	done
 
-	m_say "Reached end of '$FILE_QUOTES'"
-	m_say "All done!"
+	msyl_say "Reached end of '$FILE_QUOTES'"
+	msyl_say "All done!"
 }
 
 main "$@"

@@ -11,8 +11,8 @@
 #===============================================================================
 
 # Enable strict mode in debug mode
-[[ $DEBUG ]] && set -o nounset
-set -o errexit -o pipefail
+[[ $DEBUG ]] #&& set -o nounset 
+set -o pipefail -o errexit
 
 LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
 source "$LIBSYL"
@@ -42,10 +42,13 @@ F_RENDER_TMP=
 # Options
 OPT_FORCE=
 OPT_OPEN=
+OPT_KEEP_FILES=
 # Error codes
-ERR_IM_QUOTE=11
-ERR_IM_SOURCE=22
-ERR_IM_TEXT=33
+ERR_IM_BG=11
+ERR_IM_QUOTE=22
+ERR_IM_SOURCE=33
+ERR_IM_TEXT=44
+ERR_IM_COMPOSE=55
 
 # Print help
 fn_show_help() {
@@ -58,7 +61,7 @@ OPTIONS
     QUOTE STRING    set text (see QUOTE STRING FORMAT) (mandatory)
     -o FILE         set output file (default: '$OUTFILE')
     -b NAME         set background color (default: '$BG_COLOR')
-    -bf FILE        set background image
+    -bf FILE        set background image (overrides -b)
     -s {X}x{Y}      set size of rendered image in pixels with a 4:3 aspect ratio 
                      (e.g. 2000x1500) (default: '$SIZE')
                     NOTE: a size larger than 3000x2250 is not recommended
@@ -74,8 +77,8 @@ OPTIONS
     -f              force overwrite of output file (default: no)
     -h, --help      display this help
     --open          open rendered image file via \`xdg-open\`
-    --list-fonts    show list of available fonts via \`convert -list font\`
-    --list-colors   show list of available colors via \`convert -list color\`
+    --list-fonts    show list of available fonts via \`magick -list font\`
+    --list-colors   show list of available colors via \`magick -list color\`
 QUOTE STRING FORMAT
     The text of a quote is parsed from a string formatted as follows:
         {quote}@{source}
@@ -93,50 +96,51 @@ fn_print_params() {
 	cat 1>&2 << EOF
  QUOTE_STRING_SET $QUOTE_STRING_SET
  QUOTE_STRING     $QUOTE_STRING
- BG               $BG
+ BG_COLOR         $BG_COLOR
+ BG_FILE          $BG_FILE
  FONT_QUOTE       $FONT_QUOTE
  FONT_SOURCE      $FONT_SOURCE
  FONT_COLOR       $FONT_COLOR
 
  OPT_FORCE        $OPT_FORCE
- OPT_OPEN         $OPT_RESET
+ OPT_OPEN         $OPT_OPEN
+ OPT_KEEP_FILES   $OPT_KEEP_FILES
 
  OUTFILE          $OUTFILE
  SIZE             $SIZE
 
- DIR_RENDER_TMP   $DIR_RENDER_TMP
- F_BG_TMP_0       $F_BG_TMP_0
- F_BG_TMP         $F_BG_TMP
- F_ QUOTE_TMP     $F_QUOTE_TMP
- F_ SOURCE_TMP    $F_SOURCE_TMP
- F_ TEXT_TMP      $F_TEXT_TMP
- F_ RENDER_TMP    $F_RENDER_TMP
 EOF
 }
 # Check full quote string was set
 fn_check_quote_string_set() {
-	[[ $QUOTE_STRING_SET ]] || return
+	[[ $QUOTE_STRING_SET ]] || syl_exit_err "please specify quote string (format: \"{quote}@{source}\")" $ERR_WRONG_ARG
 }
 # Check full quote string format
 fn_check_quote_string() {
-	[[ "$QUOTE_STRING" =~ .+@.+ ]] || return
+	[[ "$QUOTE_STRING" =~ .+@.+ ]] || syl_exit_err "invalid quote string '$QUOTE_STRING'\n\tformat: \"{quote}@{source}\"" $ERR_WRONG_ARG
 }
 # Check bg file
 fn_check_bg_file() {
+	local ERR=
 	if [[ ! -f "$BG_FILE" ]]; then
-		return 1
+		ERR=1
 	else
-		identify "$BG_FILE" 2>/dev/null 1>/dev/null || return
+		magick identify "$BG_FILE" 1>/dev/null || ERR=1
 	fi
+	[[ $ERR ]] && syl_exit_err "invalid background image '$BG_FILE'" $ERR_WRONG_ARG
+}
+# Check bg color
+fn_check_bg_color() {
+	magick -list color | fgrep -w "$BG_COLOR" 1>/dev/null || syl_exit_err "invalid background color '$BG_COLOR'" $ERR_WRONG_ARG
 }
 # Check font color
 fn_check_font_color() {
-	## Font color: is ! hex?
+	# Font color: is ! hex?
 	if [[ ! "$FONT_COLOR" =~ ^\#[A-Fa-f0-9]{6}$ ]]; then
-		## Font color: is ! rgb(...)?
+		# Font color: is ! rgb(...)?
 		if [[ ! "$FONT_COLOR" =~ ^rgb\([0-9]{1,3},[0-9]{1,3},[0-9]{1,3}\)$ ]]; then
-			## Font color: is ! IM color?
-			convert -list color | fgrep -w "$FONT_COLOR" || return
+			# Font color: is ! IM color?
+			magick -list color | fgrep -w "$FONT_COLOR" 1>/dev/null || syl_exit_err "invalid font color '$FONT_COLOR'" $ERR_WRONG_ARG
 		fi
 	fi
 }
@@ -145,50 +149,55 @@ fn_check_fonts() {
 	for F in "$FONT_QUOTE" "$FONT_SOURCE"; do
 		if [[ ! -f "$F" ]]; then
 			# not perfect as it matches "(Font: Unna)" in "Font: Unna-Bold"
-			convert -list font | fgrep -w "Font: $F" || return 1
+			magick -list font | fgrep -w "Font: $F" 1>/dev/null || syl_exit_err "invalid font '$F'" $ERR_WRONG_ARG
 		fi
 	done
 }
-# Check arguments (self-contained)
+# Check arguments
 fn_check_args() {
 	fn_check_quote_string_set
-	[[ $? -eq 0 ]] || syl_exit_err "please specify quote string (format: \"{quote}@{source}\")" $ERR_WRONG_ARG
 	fn_check_quote_string
-	[[ $? -eq 0 ]] || syl_exit_err "invalid quote string '$QUOTE_STRING'\n\tformat: \"{quote}@{source}\"" $ERR_WRONG_ARG
-	[[ $BG_FILE ]] && {
-		fn_check_bg_file
-		[[ $? -eq 0 ]] || syl_exit_err "invalid background image '$BG_FILE'" $ERR_WRONG_ARG
-	}
+	[[ $BG_FILE ]] && fn_check_bg_file || fn_check_bg_color
 	fn_check_font_color
-	[[ $? -eq 0 ]] || syl_exit_err "invalid font color '$FONT_COLOR'" $ERR_WRONG_ARG
 	fn_check_fonts
-	[[ $? -eq 0 ]] || syl_exit_err "invalid font '$FONT_QUOTE' or '$FONT_SOURCE'" $ERR_WRONG_ARG
+}
+# Set tmp files
+fn_set_tmp_files() {
+	F_BG_TMP_0="${DIR_RENDER_TMP}/bg_0.$EXT"
+	F_BG_TMP="${DIR_RENDER_TMP}/bg.$EXT"
+	F_QUOTE_TMP="${DIR_RENDER_TMP}/quote.$EXT"
+	F_SOURCE_TMP="${DIR_RENDER_TMP}/source.$EXT"
+	F_TEXT_TMP="${DIR_RENDER_TMP}/text.$EXT"
+	F_RENDER_TMP="${DIR_RENDER_TMP}/render.$EXT"
+	syl_say_debug "Temporary files: \n\t$F_BG_TMP_0 \n\t$F_BG_TMP \n\t$F_QUOTE_TMP \n\t$F_SOURCE_TMP \n\t$F_TEXT_TMP \n\t$F_RENDER_TMP"
 }
 # Make bg canvas
 fn_make_bg() {
 	# Make bg with provided img
-	[[ $BG_FILE ]] && {
+	if [[ $BG_FILE ]]; then
 		cp $V -f "$BG_FILE" "$F_BG_TMP_0" || syl_exit_err "can't copy '$BG_FILE' to '$F_BG_TMP_0'" $ERR_NO_FILE
-		convert $V_IM "$F_BG_TMP_0" -resize "$SIZE^" -gravity "center" -crop "$SIZE+0+0" +repage "$F_BG_TMP"
-		return
-	}
-	# Make bg with IM
-	convert $V_IM xc:${BG_COLOR} -geometry $SIZE "$F_BG_TMP"
-	return
+		magick convert $V_IM "$F_BG_TMP_0" -resize "$SIZE^" -gravity "center" -crop "$SIZE+0+0" +repage "$F_BG_TMP" || 
+			syl_exit_err "can't make background with file '$BG_FILE'" $ERR_IM_BG
+	else
+		magick convert $V_IM xc:${BG_COLOR} -geometry "$SIZE!" "$F_BG_TMP" ||
+			syl_exit_err "can't make background with color '$BG_COLOR'" $ERR_IM_BG
+	fi
 }
 # Make quote canvas
-# $1: quote string, $2: enables guillemets (opt)
+# $1: quote string, $2: enables guillemets (opt), $3: text gravity (opt)
 fn_make_text_quote() {
 	local QUOTE="$1"
-	[[ $2 ]] && QUOTE="«\ $1\ »"
-	convert $V_IM -background none -fill "$FONT_COLOR" -size 3000x1800 -font "$FONT_QUOTE"  -gravity west -bordercolor none -border 5%   caption:"$QUOTE" "$F_QUOTE_TMP"
-	return
+	local GRAVITY="west"
+	[[ $2 ]] && QUOTE="« $1 »"
+	[[ $3 ]] && GRAVITY="$3"
+	printf "$QUOTE" | magick convert $V_IM -background none -fill "$FONT_COLOR" -size 3000x1800 -font "$FONT_QUOTE" -gravity "$GRAVITY" -bordercolor none -border 5% caption:@- "$F_QUOTE_TMP" || syl_exit_err "can't make quote text out of \"$QUOTE\"" $ERR_IM_QUOTE
 }
 # Make source canvas
-# $1: source string
+# $1: source string, $2: text gravity (opt)
 fn_make_text_source() {
-	convert $V_IM -background none -fill "$FONT_COLOR" -size 2000x450  -font "$FONT_SOURCE" -gravity east -bordercolor none -border 25%  caption:"$1"      "$F_SOURCE_TMP"
-	return
+	local GRAVITY="east"
+	[[ $2 ]] && GRAVITY="$2"
+	printf "$1" | magick convert $V_IM -background none -fill "$FONT_COLOR" -size 2000x450  -font "$FONT_SOURCE" -gravity "$GRAVITY" -bordercolor none -border 25%   caption:@- "$F_SOURCE_TMP" || syl_exit_err "can't make source text out of \"$SOURCE\"" $ERR_IM_SOURCE
 }
 # Make full text canvas
 fn_make_text() {
@@ -199,24 +208,20 @@ fn_make_text() {
 	fn_parse_source "$QUOTE_STRING"
 	SOURCE="$RET"
 
-	fn_make_text_quote "$QUOTE" 1
-	[[ $? -eq 0 ]] || syl_exit_err "can't make quote text out of \"$QUOTE\"" $ERR_IM_QUOTE
+	fn_make_text_quote "$QUOTE" 1 "west"
 	fn_make_text_source "$SOURCE"
-	[[ $? -eq 0 ]] || syl_exit_err "can't make source text out of \"$SOURCE\"" $ERR_IM_SOURCE
-	convert $V_IM -background none -fill none -gravity east "$F_QUOTE_TMP" "$F_SOURCE_TMP" -append -resize "$SIZE" "$F_TEXT_TMP"
-	return
+	magick convert $V_IM -background none -fill none -gravity east "$F_QUOTE_TMP" "$F_SOURCE_TMP" -append -resize "$SIZE^" -crop "$SIZE+0+0" "$F_TEXT_TMP" ||
+		syl_exit_err "can't make text out of '$F_QUOTE_TMP' and '$F_SOURCE_TMP'" $ERR_IM_TEXT
 }
 # Merge text canvas and background canvas
 fn_compose() {
-	composite "$F_TEXT_TMP" "$F_BG_TMP" "$F_RENDER_TMP"
-	return
+	magick composite "$F_TEXT_TMP" "$F_BG_TMP" "$F_RENDER_TMP" || 
+		syl_exit_err "can't 'mv' '$F_RENDER_TMP' to '$OUTFILE'" $ERR_IM_COMPOSE
 }
 
 
 main() {
-	syl_need_cmd "montage"
-	syl_need_cmd "composite"
-	syl_need_cmd "convert"
+	syl_need_cmd "magick"
 
 	# PARSE ARGUMENTS
 	[[ $# -eq 0 ]] && 	{ fn_show_help ; exit ; }
@@ -268,10 +273,13 @@ main() {
 				OPT_OPEN=1
 				;;
 			"--list-fonts")
-				convert -list font
+				magick -list font
 				;;
 			"--list-colors")
-				convert -list color
+				magick -list color
+				;;
+			"--keep-files")
+				OPT_KEEP_FILES=1
 				;;
 			*)
 				[[ $QUOTE_STRING_SET ]] && msyl_say "[Warning] Quote string was reset."
@@ -283,25 +291,24 @@ main() {
 		shift
 	done
 
-	# CHECKING ARGS VALIDITY
-	fn_check_args
-	exit
-
 	[[ $DEBUG ]] && {
 		V="-v"
 		V_IM="-verbose"
 		fn_print_params
 	}
 
+	# CHECKING ARGS VALIDITY
+	fn_check_args
+
 	syl_mktemp_dir "situation"
 	DIR_RENDER_TMP="$RET"
-	trap 'rm -rfv $DIR_RENDER_TMP' EXIT
+	fn_set_tmp_files
+	[[ $OPT_KEEP_FILES ]] || trap 'rm -rfv $DIR_RENDER_TMP' EXIT
 
 	msyl_say "Making background..."
 	fn_make_bg
 	msyl_say "Making text..."
 	fn_make_text
-	[[ $? -eq 0 ]] || syl_exit_err "can't make text out of '$F_QUOTE_TMP' and '$F_SOURCE_TMP'" $ERR_IM_TEXT
 	msyl_say "Merging to $OUTFILE..."
 	fn_compose
 	mv $V -f "$F_RENDER_TMP" "$OUTFILE" || syl_exit_err "can't 'mv' '$F_RENDER_TMP' to '$OUTFILE'" $ERR_NO_FILE
