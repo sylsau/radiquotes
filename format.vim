@@ -16,9 +16,9 @@
 " No spaces around guillemets to differentiate them from whole quote guillemets
 :%s/ »/»/g
 :%s/« /«/g
-" Unbreakable UTF-8 spaces
+" Unbreakable UTF-8 spaces (disabled bc it breaks IM text formatting sometimes)
 ":%s/« /«\\u00A0/g
 ":%s/ »/\\u00A0»/g
-:%s/ \([!?;:]\)/\\u00A0\1/g
+":%s/ \([!?;:]\)/\\u00A0\1/g
 " Make line of two '='-separated fields (quote=source)
 :%s/\n--- /@/
