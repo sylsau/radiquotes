@@ -6,10 +6,10 @@ Posts pictures of quotes from radical authors.
 ## Process
 * *quotes.orig* :	stores pre-formatted quote list  
 * *quotes* :		stores formatted quote list via *format.vim*  
-* *format.vim* :		vim script for formatting quote list  
-* *tweet.sh* :		tweeter  
+* *format.vim* :	vim script for formatting quote list  
+* *situation.sh* : 	quote image creator (<https://github.com/ResponSySS/situation>)
 * *render.sh* :		renderer  
-* *situation.sh* : 	quote image creator  
+* *tweet.sh* :		tweeter  
  
  1. `make quotes` turns *quotes.orig* into *quotes* with `format.vim`
  2. `./render.sh` use *quotes* to make quote images in *./Renders/* with `situation.sh`
