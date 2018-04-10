@@ -88,7 +88,7 @@ fn_make_filename() {
 	AUTHOR=$(	printf "$2" | sed 's/'$NBSP'/ /g' | cut -d ',' -f1 )
 	RET="${DIR_RENDER}/$( echo "${AUTHOR}-${QUOTE_START}.${EXT}" | tr ' ' '_' )"
 }
-# $1: full quote string, $3: filename
+# $1: full quote string, $2: filename
 fn_render() {
 	$SITUATION "$1" -o "$2" $SITUARGS
 }
@@ -139,6 +139,8 @@ main() {
 	# Dry-run
 	[[ $OPT_DRYRUN ]] && SITUATION="echo $SITUATION"
 
+	# Creating render dir if non-existent
+	[[ -d "$DIR_RENDER" ]] || mkdir -v $DIR_RENDER
 	# Reseting render dir
 	[[ -n "$( \ls "${DIR_RENDER}" )" ]] || {
 		msyl_say "[Warning] Directory ${DIR_RENDER}/ is already empty."
