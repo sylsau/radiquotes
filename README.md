@@ -31,8 +31,9 @@ Posts pictures of quotes from radical authors.
 	[...]
 
 ## Format of *quotes*
- Two '@'-separated fields, 1st is quote, 2nd is source.  
+ Two `@`-separated fields, 1st is quote, 2nd is source.  
  Must be formatted as follows:  
+
 	{text1}@{author1}, {book1} [...]
 	{text2}@{author2}, {book2} [...]
 
