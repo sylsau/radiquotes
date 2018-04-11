@@ -11,8 +11,8 @@
 :%s/^\s\+//
 :%s/^\n\+//
 " Turns " to UTF-8 alternatives
-:%s/ "\(\w\)/“\1/g
-:%s/\(\w\)" /\1”/g
+:%s/\(\W\)"\(\w\)/\1“\2/g
+:%s/\(\w\)"\(\W\)/\1”\2/g
 " No spaces around guillemets to differentiate them from whole quote guillemets
 :%s/ »/»/g
 :%s/« /«/g
