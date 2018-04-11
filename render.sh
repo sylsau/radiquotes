@@ -32,7 +32,7 @@ OPT_FORCE=
 OPT_DRYRUN=
 READ_SITUARGS=0
 # Default arguments for situation
-SITUARGS="-c rgb(43,254,210) -fontq ./Fonts/Avenir_next_condensed/AvenirNextCondensed-Heavy.ttf -fonts ./Fonts/Avenir/Avenir-BookOblique.ttf"
+SITUARGS="-b black -c rgb(43,254,210) -fontq ./Fonts/Avenir_next_condensed/AvenirNextCondensed-Heavy.ttf -fonts ./Fonts/Avenir/Avenir-BookOblique.ttf"
 # Temp files
 FILE_QUOTES_TMP=
 # Extension of rendered images
@@ -56,6 +56,8 @@ OPTIONS
     --                  all arguments beyond '--' will be transmitted to
                         $SITUATION as is
     --dry-run           don't do anything, just 'echo' commands
+DEFAULT ARGUMENTS FOR $SITUATION
+    $SITUARGS
 EXAMPLE
     $ $SCRIPT_NAME   -d My_renders/ -- -fontcol snow3 -b /tmp/tiddies.jpg
     $ $SCRIPT_NAME   -d My_shitty_renders/ --reset -- -fontq times_new_roman.otf

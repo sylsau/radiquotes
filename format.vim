@@ -16,6 +16,8 @@
 " No spaces around guillemets to differentiate them from whole quote guillemets
 :%s/ »/»/g
 :%s/« /«/g
+" -- to UTF-8 − dashes
+:%s/\([^-]\)--\([^-]\)/\1−\2/gc
 " Unbreakable UTF-8 spaces (disabled bc it breaks IM text formatting sometimes)
 ":%s/« /«\\u00A0/g
 ":%s/ »/\\u00A0»/g

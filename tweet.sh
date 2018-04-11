@@ -41,9 +41,10 @@ fn_show_help() {
 $SCRIPT_NAME $VERSION
     Radiquote tweeter for Aufhebung.
 USAGE
-    $SCRIPT_NAME [--help] {FILE} ...
+    $SCRIPT_NAME [--help] [--preview] {FILE} ...
 DESCRIPTION
     Tweets quote image FILE. If more than one FILE, pick a random one.
+    --preview           show image before tweeting it via \`xdg-open\`
 AUTHOR
     Collectif Aufhebung: <http://aufhebung.fr>
     Written by Sylvain Saubier (<http://SystemicResponse.com>)
@@ -86,6 +87,7 @@ fn_tweet() {
 	fn_get_random_file "$@"
 	[[ $RET ]] || 	syl_exit_err "Can't get random argument from '$@'" $ERR_WRONG_ARG
 	FILE_TO_UPLOAD="$RET"
+	[[ $PREVIEW ]] && xdg-open "$FILE_TO_UPLOAD"
 	# Get status (author) from filename
 	fn_get_author "$FILE_TO_UPLOAD"
 	[[ $RET ]] || 	syl_exit_err "Can't get author from file '$FILE_TO_UPLOAD'" $ERR_PARSE_AUTHOR
@@ -111,9 +113,10 @@ main() {
 
 	# Parse arguments
 	local SHOW_HELP=
-	[[ $# -eq 0 ]] 		&& 	SHOW_HELP=1
-	[[ "$1" = "-h"  ]] 	&& 	SHOW_HELP=1
-	[[ "$1" = "--help"  ]] 	&& 	SHOW_HELP=1
+	local PREVIEW=
+	[[ $# -eq 0 ]] 		  && 	SHOW_HELP=1
+	[[ "$1" =~ ^(h|help)$  ]] && 	SHOW_HELP=1
+	[[ "$1" = "--preview"  ]] && 	PREVIEW=1
 	[[ $SHOW_HELP ]]&& 	{ fn_show_help ; exit ; }
 
 	fn_tweet "$@"
