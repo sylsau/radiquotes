@@ -1,12 +1,11 @@
 #!/bin/bash -
 #===============================================================================
 #
-#         USAGE: ./bot.sh --help
+#         USAGE: ./this.sh --help
 #
 #   DESCRIPTION: RTFM (--help)
 #  REQUIREMENTS: twurl, make, sed, shuf
 #        AUTHOR: Sylvain S. (ResponSyS), mail@sylsau.com
-#  ORGANIZATION: 
 #       CREATED: 04/05/2018 02:28:35 PM
 #===============================================================================
 
