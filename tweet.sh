@@ -15,15 +15,16 @@
 
 # Set debug parameters
 [[ $DEBUG ]] && set -o nounset
-set -o pipefail #-o errexit
+set -o pipefail -o errexit -o errtrace
+trap 'syl_exit_err "at $FUNCNAME:$LINENO"' ERR
 
-LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
+readonly LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
 source "$LIBSYL"
 
-VERSION=0.9
+readonly VERSION=0.9
 
 # 'twurl' command
-TWURL=${TWURL:-/usr/local/bin/twurl}
+readonly TWURL=${TWURL:-/usr/local/bin/twurl}
 FILE_TO_UPLOAD=
 # Media id string
 MEDIA_IDS=
@@ -31,9 +32,9 @@ MEDIA_IDS=
 STATUS=
 FILE_LOG="${TMP_DIR}/radiquotes-tweet.log"
 # Error codes
-ERR_PARSE_AUTHOR=11
-ERR_UPLOAD=22
-ERR_POST=33
+readonly ERR_PARSE_AUTHOR=11
+readonly ERR_UPLOAD=22
+readonly ERR_POST=33
 
 # Print help
 fn_show_help() {
@@ -114,9 +115,9 @@ main() {
 	# Parse arguments
 	local SHOW_HELP=
 	local PREVIEW=
+	[[ "$1" = "--preview"  ]] && 	{ PREVIEW=1 ; shift ; }
+	[[ "$1" =~ ^-(h|-help)$  ]] && 	SHOW_HELP=1
 	[[ $# -eq 0 ]] 		  && 	SHOW_HELP=1
-	[[ "$1" =~ ^(h|help)$  ]] && 	SHOW_HELP=1
-	[[ "$1" = "--preview"  ]] && 	PREVIEW=1
 	[[ $SHOW_HELP ]]&& 	{ fn_show_help ; exit ; }
 
 	fn_tweet "$@"

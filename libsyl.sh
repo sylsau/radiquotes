@@ -6,19 +6,19 @@
 #      CREATED: 04/09/2018 08:30:10 PM
 #===============================================================================
 
-SCRIPT_NAME="${0##*/}"
+readonly SCRIPT_NAME="${0##*/}"
 
 # Format characters
-FMT_BOLD='\e[1m'
-FMT_UNDERL='\e[4m'
-FMT_OFF='\e[0m'
+readonly FMT_BOLD='\e[1m'
+readonly FMT_UNDERL='\e[4m'
+readonly FMT_OFF='\e[0m'
 # Error codes
-ERR_WRONG_ARG=2
-ERR_NO_FILE=127
+readonly ERR_WRONG_ARG=2
+readonly ERR_NO_FILE=127
 # Return value
 RET=
 # Temporary dir
-TMP_DIR="/tmp"
+readonly TMP_DIR="/tmp"
 
 # Test if a file exists (dir or not)
 # $1: path to file
@@ -60,13 +60,13 @@ syl_cd_workdir() {
 # $1: prefix for tmp file, $2: suffix (opt)
 syl_mktemp() {
 	[[ $1 ]] || syl_exit_err "${FUNCNAME[0]}: please specify a prefix for temporary file name" $ERR_WRONG_ARG
-	local PATT="$1-$USER-XXXX$2"
+	readonly local PATT="$1-$USER-XXXX$2"
 	RET="$( mktemp "${TMP_DIR}/$PATT" )" || syl_exit_err "can't create temporary file '$PATT' in '$TMP_DIR'" $ERR_NO_FILE
 }
 # Create tmp dir
 # $1: prefix for tmp dir
 syl_mktemp_dir() {
 	[[ $1 ]] || syl_exit_err "${FUNCNAME[0]}: please specify a prefix for temporary directory name" $ERR_WRONG_ARG
-	local PATT="$1-$USER-XXXX"
+	readonly local PATT="$1-$USER-XXXX"
 	RET="$( mktemp -d "${TMP_DIR}/$PATT" )" || syl_exit_err "can't create temporary directory '${PATT}/' in '$TMP_DIR'" $ERR_NO_FILE
 }

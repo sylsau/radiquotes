@@ -14,16 +14,17 @@
 
 # Set debug parameters
 [[ $DEBUG ]] && set -o nounset
-set -o errexit -o pipefail
+set -o pipefail -o errexit -o errtrace
+trap 'syl_exit_err "at $FUNCNAME:$LINENO"' ERR
 
-LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
+readonly LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
 source "$LIBSYL"
-LIBPARSE=${LIBPARSE:-$HOME/Devel/Src/radiquotes/libparse.sh}
+readonly LIBPARSE=${LIBPARSE:-$HOME/Devel/Src/radiquotes/libparse.sh}
 source "$LIBPARSE"
 
-VERSION=0.9
+readonly VERSION=0.9
 
-SITUATION="./situation.sh"
+readonly SITUATION="./situation.sh"
 FILE_QUOTES="./quotes"
 DIR_RENDER="./Renders"
 # Options
@@ -38,7 +39,7 @@ FILE_QUOTES_TMP=
 # Extension of rendered images
 EXT="png"
 # Error codes
-ERR_FNAME=22
+readonly ERR_FNAME=22
 
 # Print help
 fn_show_help() {
@@ -56,6 +57,7 @@ OPTIONS
     --                  all arguments beyond '--' will be transmitted to
                         $SITUATION as is
     --dry-run           don't do anything, just 'echo' commands
+    --help, -h          show this help
 DEFAULT ARGUMENTS FOR $SITUATION
     $SITUARGS
 EXAMPLE
@@ -85,7 +87,7 @@ fn_make_filename() {
 	local AUTHOR=
 	# easier use of non-breakable space UTF-8 char
 	# NOTE: must use printf to handle UTF-8 char
-	local NBSP="$( printf "\u00A0" )"
+	readonly local NBSP="$( printf "\u00A0" )"
 	QUOTE_START=$( 	printf "$1" | sed 's/'$NBSP'/ /g' | cut -d ' ' -f1-6 )
 	AUTHOR=$(	printf "$2" | sed 's/'$NBSP'/ /g' | cut -d ',' -f1 )
 	RET="${DIR_RENDER}/$( echo "${AUTHOR}-${QUOTE_START}.${EXT}" | tr ' ' '_' )"

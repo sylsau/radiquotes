@@ -6,7 +6,7 @@
 #       CREATED: 04/09/2018 11:05:19 PM
 #===============================================================================
 
-ERR_PARSE=111
+readonly ERR_PARSE=111
 
 # $1: full string to parse
 fn_parse_quote() {
