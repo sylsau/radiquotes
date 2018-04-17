@@ -1,5 +1,4 @@
-* replace '' with unicode version of " in quotes
-* empty RET at start of all func
+* use 'declare arg1=... arg2=...' at top of func instead of spreading assignements on several lines
 * use libparse everywhere
 * quotes format
 	* allow newlines (replaced by \n):
@@ -14,8 +13,5 @@
 			this quote\nis long@me
 * refaire situation.sh !!!!
 	* parameter for line height in imagemagick?
+		* seems not possible
 	* option to enable/disable white guillemets
-* quote image
-	* make larger quote image by default
-	* reduce margins to a minimum
-* make libcurl C program instead of radibot.sh
