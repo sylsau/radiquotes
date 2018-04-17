@@ -12,10 +12,7 @@
 # TODO:
 # 	check that every arg is a file before processing
 
-# Set debug parameters
-[[ $DEBUG ]] && set -o nounset
-set -o pipefail -o errexit -o errtrace
-trap 'syl_exit_err "at $FUNCNAME:$LINENO"' ERR
+set -o errexit
 
 readonly LIBSYL=${LIBSYL:-$HOME/Devel/Src/radiquotes/libsyl.sh}
 source "$LIBSYL"
