@@ -2,7 +2,7 @@
 
 Twitter app/bot for Aufhebung at <http://twitter.com/AufhebungOff>.  
 Posts pictures of quotes from radical authors.  
-**Requires: libsyl (<http://github.com/ResponSySS/bash-libsyl/>), situation.sh (<http://github.com/ResponSySS/situation/>)**
+**Requires: [libsyl](http://github.com/ResponSySS/bash-libsyl/), [situation.sh](http://github.com/ResponSySS/situation/)**
 
 ## Process
 * *quotes.orig* :	stores pre-formatted quote list  
