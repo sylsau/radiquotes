@@ -85,7 +85,8 @@ fn_make_filename() {
 	# easier use of non-breakable space UTF-8 char
 	# NOTE: must use printf to handle UTF-8 char
 	local NBSP="$( printf "\u00A0" )"
-	QUOTE_START=$( 	printf "$1" | sed 's/'$NBSP'/ /g' | cut -d ' ' -f1-6 )
+    # head -1 to avoid newlines in filenames in case of multiline quotes
+	QUOTE_START=$( 	printf "$1" | head -1 | sed 's/'$NBSP'/ /g' | cut -d ' ' -f1-6 )
 	AUTHOR=$(	printf "$2" | sed 's/'$NBSP'/ /g' | cut -d ',' -f1 )
 	RET="${DIR_RENDER}/$( echo "${AUTHOR}-${QUOTE_START}.${EXT}" | tr ' ' '_' )"
 }
