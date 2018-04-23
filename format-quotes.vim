@@ -10,6 +10,8 @@
 " Removes empty lines
 :%s/^\s\+//
 :%s/^\n\+//
+" Turn UTF-8 ’ to ASCII '
+:%s/’/'/g
 " Turns " to UTF-8 alternatives
 :%s/\(\W\)"\(\w\)/\1“\2/g
 :%s/\(\w\)"\(\W\)/\1”\2/g
