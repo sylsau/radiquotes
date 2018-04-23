@@ -24,3 +24,9 @@
 ":%s/ \([!?;:]\)/\\u00A0\1/g
 " Make line of two '='-separated fields (quote=source)
 :%s/\n--- /@/
+" Turns multi-line quotes to '\n'-formatted string (needs 2 passes)
+:%s/^\([^@]\+\)$\n/\1\\n/g
+:%s/^\([^@]\+\)$\n/\1\\n/g
+
+" Highlight source of quotes
+:/@.\+$

@@ -5,9 +5,9 @@ DIR_FONTS = ./Fonts
 DIR_BG = ./Bg
 DIR_RENDERS = ./Renders
 # Quote files and vim format script 
-FILE_QUOTES_ORIG = ./quotes.orig
+FILE_QUOTES_ORIG = ./quotes.txt
 FILE_QUOTES = ./quotes
-FILE_VIM_FORMAT = ./format.vim
+FILE_VIM_FORMAT = ./format-quotes.vim
 # Main default colors
 COLOR_GREEN = rgb(43,254,210)
 COLOR_BLACK = black
@@ -69,6 +69,10 @@ deps:
 	@which montage   >/dev/null
 	@which composite >/dev/null
 	@echo "The dependency check was successful!"
+
+fetch-quotes:
+	wget 'https://docs.google.com/document/export?format=txt&id=1YiKM7IBj8sYeG2G_08Zuk8ikWnAVL3gJpzvXKOEUzvg' -O /tmp/CITATIONS_RADICALES.txt
+	@echo "Quotes were fetched from <https://aufhebung.fr/drive> to '/tmp/CITATIONS_RADICALES.txt'"
 
 bg-green: clean-bg
 	convert xc:$(COLOR_GREEN) -geometry 2000x1500! "$(FILE_BG_G)"
