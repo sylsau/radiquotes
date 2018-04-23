@@ -23,7 +23,7 @@
 ":%s/ »/\\u00A0»/g
 ":%s/ \([!?;:]\)/\\u00A0\1/g
 " Make line of two '='-separated fields (quote=source)
-:%s/\n--- /@/
+:%s/\n---\s\+/@/
 " Turns multi-line quotes to '\n'-formatted string (needs 2 passes)
 :%s/^\([^@]\+\)$\n/\1\\n/g
 :%s/^\([^@]\+\)$\n/\1\\n/g
